@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Réserver — La Garance en Provence</title>
+  <meta name="description" content="Réservez votre séjour à La Garance en Provence. Vérifiez les disponibilités et envoyez votre demande.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
+
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ---- Booking page overrides ---- */
+    .booking-hero {
+      background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.25)),
+                  url('images/garance_03.jpg') center/cover no-repeat;
+      height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      margin-top: var(--header-h);
+    }
+    .booking-hero h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 8px; }
+    .booking-hero p { font-size: 1.1rem; font-weight: 300; opacity: 0.9; }
+
+    .booking-section { padding: 80px 0; }
+    .booking-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    /* Calendar */
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .cal-header h3 {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      min-width: 200px;
+      text-align: center;
+    }
+    .cal-nav {
+      background: none;
+      border: 1.5px solid var(--terracotta);
+      color: var(--terracotta);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+    }
+    .cal-nav:hover { background: var(--terracotta); color: #fff; }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+    .cal-day-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--charcoal-lt);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 0;
+    }
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .cal-day:hover:not(.booked):not(.empty):not(.past) {
+      background: var(--cream);
+    }
+    .cal-day.empty { cursor: default; }
+    .cal-day.past { color: #ccc; cursor: default; }
+    .cal-day.booked {
+      background: #f0d0d0;
+      color: #a04040;
+      cursor: not-allowed;
+      font-weight: 600;
+    }
+    .cal-day.selected {
+      background: var(--terracotta);
+      color: #fff;
+      font-weight: 700;
+    }
+    .cal-day.in-range {
+      background: var(--terracotta-lt);
+      color: #fff;
+    }
+    .cal-day.today {
+      border: 2px solid var(--terracotta);
+      font-weight: 700;
+    }
+
+    .cal-legend {
+      display: flex;
+      gap: 20px;
+      margin-top: 16px;
+      font-size: 0.82rem;
+      color: var(--charcoal-lt);
+    }
+    .cal-legend span { display: flex; align-items: center; gap: 6px; }
+    .cal-legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+    .cal-legend-dot.avail { background: var(--cream); border: 1px solid #ddd; }
+    .cal-legend-dot.booked { background: #f0d0d0; }
+    .cal-legend-dot.selected { background: var(--terracotta); }
+
+    /* Price summary */
+    .price-summary {
+      background: var(--cream);
+      border-radius: 8px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+    .price-summary h4 {
+      font-family: var(--font-serif);
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+    }
+    .price-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 0.92rem;
+      color: var(--charcoal-lt);
+    }
+    .price-line.total {
+      border-top: 2px solid var(--terracotta-lt);
+      margin-top: 8px;
+      padding-top: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--charcoal);
+    }
+
+    /* Booking form */
+    .booking-form-section { margin-top: 0; }
+    .booking-form-section h3 {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      margin-bottom: 24px;
+    }
+
+    .booking-form label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--charcoal);
+    }
+    .booking-form input,
+    .booking-form select,
+    .booking-form textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid #e0d9cf;
+      border-radius: 4px;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      color: var(--charcoal);
+      background: var(--warm-white);
+      margin-bottom: 16px;
+      transition: border-color var(--transition);
+    }
+    .booking-form input:focus,
+    .booking-form select:focus,
+    .booking-form textarea:focus {
+      outline: none;
+      border-color: var(--terracotta);
+    }
+    .booking-form textarea { resize: vertical; min-height: 100px; }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .date-display {
+      background: var(--cream);
+      padding: 14px 16px;
+      border-radius: 4px;
+      font-size: 0.92rem;
+      margin-bottom: 16px;
+      color: var(--charcoal-lt);
+      min-height: 48px;
+    }
+    .date-display strong { color: var(--charcoal); }
+
+    .btn-book {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--terracotta);
+      color: #fff;
+      border: 2px solid var(--terracotta);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all var(--transition);
+      margin-top: 8px;
+    }
+    .btn-book:hover { background: var(--terracotta-dk); border-color: var(--terracotta-dk); }
+    .btn-book:disabled {
+      background: #ccc;
+      border-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .booking-success {
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      display: none;
+    }
+    .booking-success h3 { color: #2e7d32; margin-bottom: 8px; }
+    .booking-success p { color: #4a4a4a; }
+    .booking-success .booking-ref { font-size: 1.3rem; font-weight: 700; color: var(--terracotta); margin: 12px 0; }
+
+    .booking-note {
+      font-size: 0.82rem;
+      color: var(--charcoal-lt);
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .booking-grid { grid-template-columns: 1fr; gap: 40px; }
+      .booking-hero { height: 260px; }
+      .form-row-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER (same as main site) -->
+  <header class="site-header scrolled">
+    <nav class="nav-inner">
+      <a href="/" class="nav-logo" style="color:var(--charcoal)">La Garance</a>
+      <ul class="nav-links">
+        <li><a href="/#about" style="color:var(--charcoal)" data-i18n="nav_about">La Maison</a></li>
+        <li><a href="/#rooms" style="color:var(--charcoal)" data-i18n="nav_rooms">Chambres</a></li>
+        <li><a href="/#gallery" style="color:var(--charcoal)" data-i18n="nav_gallery">Galerie</a></li>
+        <li><a href="/#pricing" style="color:var(--charcoal)" data-i18n="nav_pricing">Tarifs</a></li>
+        <li><a href="/booking" style="color:var(--terracotta);font-weight:700" data-i18n="nav_booking">Réserver</a></li>
+        <li><a href="/#contact" style="color:var(--charcoal)" data-i18n="nav_contact">Contact</a></li>
+        <li>
+          <div class="lang-toggle" style="border-color:var(--charcoal)">
+            <button class="lang-btn active" data-lang="fr" style="color:var(--charcoal)">FR</button>
+            <button class="lang-btn" data-lang="en" style="color:var(--charcoal)">EN</button>
+          </div>
+        </li>
+      </ul>
+      <button class="nav-hamburger" aria-label="Menu">
+        <span style="background:var(--charcoal)"></span>
+        <span style="background:var(--charcoal)"></span>
+        <span style="background:var(--charcoal)"></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <div class="booking-hero">
+    <div>
+      <h1 data-i18n="bk_title">Réserver votre séjour</h1>
+      <p data-i18n="bk_subtitle">Vérifiez les disponibilités et envoyez votre demande</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <section class="booking-section">
+    <div class="container">
+      <div class="booking-grid">
+
+        <!-- LEFT: Calendar + Price -->
+        <div>
+          <div id="calendar-widget">
+            <div class="cal-header">
+              <button class="cal-nav" id="cal-prev">&#8249;</button>
+              <h3 id="cal-title"></h3>
+              <button class="cal-nav" id="cal-next">&#8250;</button>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+            <div class="cal-legend">
+              <span><span class="cal-legend-dot avail"></span> <span data-i18n="bk_available">Disponible</span></span>
+              <span><span class="cal-legend-dot booked"></span> <span data-i18n="bk_booked">Réservé</span></span>
+              <span><span class="cal-legend-dot selected"></span> <span data-i18n="bk_selected">Sélectionné</span></span>
+            </div>
+          </div>
+
+          <div class="price-summary" id="price-summary" style="display:none">
+            <h4 data-i18n="bk_estimate">Estimation tarifaire</h4>
+            <div class="price-line">
+              <span data-i18n="bk_accom">Hébergement</span>
+              <span id="price-accom">—</span>
+            </div>
+            <div class="price-line">
+              <span data-i18n="bk_cleaning">Ménage</span>
+              <span id="price-cleaning">250 €</span>
+            </div>
+            <div class="price-line">
+              <span data-i18n="bk_taxe">Taxe de séjour</span>
+              <span id="price-taxe">—</span>
+            </div>
+            <div class="price-line total">
+              <span>Total</span>
+              <span id="price-total">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Form -->
+        <div class="booking-form-section">
+          <h3 data-i18n="bk_form_title">Demande de réservation</h3>
+
+          <div class="date-display" id="date-display">
+            <span data-i18n="bk_select_dates">Sélectionnez vos dates d'arrivée et de départ sur le calendrier</span>
+          </div>
+
+          <form class="booking-form" id="booking-form">
+            <div class="form-row-2">
+              <div>
+                <label data-i18n="bk_name">Nom complet *</label>
+                <input type="text" name="guest_name" required placeholder="Jean Dupont">
+              </div>
+              <div>
+                <label data-i18n="bk_email">Email *</label>
+                <input type="email" name="guest_email" required placeholder="jean@email.com">
+              </div>
+            </div>
+
+            <label data-i18n="bk_address">Adresse *</label>
+            <input type="text" name="guest_address" required data-i18n="bk_ph_address" placeholder="12 rue de la Paix, 75002 Paris, France">
+
+            <div class="form-row-2">
+              <div>
+                <label data-i18n="bk_phone">Téléphone</label>
+                <input type="tel" name="guest_phone" placeholder="+33 6 ...">
+              </div>
+              <div>
+                <label data-i18n="bk_guests">Nombre total de personnes *</label>
+                <select name="num_guests" required>
+                  <option value="2">2</option>
+                  <option value="4">4</option>
+                  <option value="6">6</option>
+                  <option value="8" selected>8</option>
+                  <option value="10">10</option>
+                  <option value="12">12</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div>
+                <label data-i18n="bk_adults">Adultes *</label>
+                <select name="num_adults" required>
+                  <option value="2">2</option>
+                  <option value="4">4</option>
+                  <option value="6" selected>6</option>
+                  <option value="8">8</option>
+                  <option value="10">10</option>
+                  <option value="12">12</option>
+                </select>
+              </div>
+              <div>
+                <label data-i18n="bk_children">Enfants</label>
+                <select name="num_children">
+                  <option value="0" selected>0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+            </div>
+
+            <label data-i18n="bk_message">Message (optionnel)</label>
+            <textarea name="message" rows="4" data-i18n="bk_ph_message" placeholder="Questions, besoins particuliers..."></textarea>
+
+            <button type="submit" class="btn-book" id="btn-book" disabled data-i18n="bk_submit">Envoyer la demande</button>
+
+            <p class="booking-note" data-i18n="bk_note">
+              Cette demande ne constitue pas une réservation ferme. Régis vous contactera sous 24h pour confirmer la disponibilité et les modalités de paiement.
+            </p>
+          </form>
+
+          <div class="booking-success" id="booking-success">
+            <h3 data-i18n="bk_success_title">Demande envoyée !</h3>
+            <p data-i18n="bk_success_p1">Votre demande a bien été enregistrée.</p>
+            <div class="booking-ref" id="booking-ref"></div>
+            <p data-i18n="bk_success_p2">Régis vous contactera sous 24h pour confirmer votre réservation.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <span data-i18n="footer_copy">© 2026 La Garance en Provence. Tous droits réservés.</span>
+        <span class="footer-stars">★★★</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  (function() {
+    'use strict';
+
+    // ---- Config (STATIC MODE — no backend needed) ----
+    // Blocked date ranges: update this list when bookings change
+    const BLOCKED_RANGES = [
+      { from: '2026-01-01', to: '2026-06-27' },  // Hors saison
+      { from: '2026-06-27', to: '2026-07-04' },  // Carter
+      { from: '2026-07-18', to: '2026-07-25' },  // Jault
+      { from: '2026-07-25', to: '2026-09-05' },  // De Graaf
+      { from: '2026-09-05', to: '2026-12-31' },  // Hors saison
+    ];
+
+    // Weekly rates by month
+    const WEEKLY_RATES = {
+      1: 6500, 2: 6500, 3: 6500, 4: 6500, 5: 6500,
+      6: 7150, 7: 7650, 8: 7650, 9: 7150,
+      10: 6500, 11: 6500, 12: 6500,
+    };
+
+    // Contact email for form submissions
+    const CONTACT_EMAIL = 'contact@garance-provence.com';
+
+    const MONTH_NAMES = {
+      fr: ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
+      en: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    };
+    const DAY_LABELS = {
+      fr: ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
+      en: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    };
+
+    // ---- Translations ----
+    const T = {
+      fr: {
+        nav_about: 'La Maison', nav_rooms: 'Chambres', nav_gallery: 'Galerie',
+        nav_pricing: 'Tarifs', nav_booking: 'Réserver', nav_contact: 'Contact',
+        bk_title: 'Réserver votre séjour',
+        bk_subtitle: 'Vérifiez les disponibilités et envoyez votre demande',
+        bk_available: 'Disponible', bk_booked: 'Réservé', bk_selected: 'Sélectionné',
+        bk_estimate: 'Estimation tarifaire',
+        bk_accom: 'Hébergement', bk_cleaning: 'Ménage', bk_taxe: 'Taxe de séjour',
+        bk_form_title: 'Demande de réservation',
+        bk_select_dates: "Sélectionnez vos dates d'arrivée et de départ sur le calendrier",
+        bk_name: 'Nom complet *', bk_email: 'Email *', bk_address: 'Adresse *', bk_ph_address: '12 rue de la Paix, 75002 Paris, France', bk_phone: 'Telephone',
+        bk_guests: 'Nombre total de personnes *', bk_adults: 'Adultes *', bk_children: 'Enfants',
+        bk_message: 'Message (optionnel)',
+        bk_ph_message: 'Questions, besoins particuliers...',
+        bk_submit: 'Envoyer la demande',
+        bk_note: "Cette demande ne constitue pas une réservation ferme. Régis vous contactera sous 24h pour confirmer la disponibilité et les modalités de paiement.",
+        bk_success_title: 'Demande envoyée !',
+        bk_success_p1: 'Votre demande a bien été enregistrée.',
+        bk_success_p2: 'Régis vous contactera sous 24h pour confirmer votre réservation.',
+        bk_checkin: 'Arrivée', bk_checkout: 'Départ', bk_nights: 'nuits',
+        bk_err_booked: 'Certaines dates sélectionnées sont déjà réservées.',
+        bk_err_server: 'Erreur serveur. Veuillez réessayer.',
+        footer_copy: '© 2026 La Garance en Provence. Tous droits réservés.',
+      },
+      en: {
+        nav_about: 'The House', nav_rooms: 'Rooms', nav_gallery: 'Gallery',
+        nav_pricing: 'Rates', nav_booking: 'Book', nav_contact: 'Contact',
+        bk_title: 'Book your stay',
+        bk_subtitle: 'Check availability and send your request',
+        bk_available: 'Available', bk_booked: 'Booked', bk_selected: 'Selected',
+        bk_estimate: 'Price estimate',
+        bk_accom: 'Accommodation', bk_cleaning: 'Cleaning', bk_taxe: 'Tourist tax',
+        bk_form_title: 'Booking request',
+        bk_select_dates: 'Select your check-in and check-out dates on the calendar',
+        bk_name: 'Full name *', bk_email: 'Email *', bk_address: 'Address *', bk_ph_address: '12 Peace Street, 75002 Paris, France', bk_phone: 'Phone',
+        bk_guests: 'Total guests *', bk_adults: 'Adults *', bk_children: 'Children',
+        bk_message: 'Message (optional)',
+        bk_ph_message: 'Questions, special requirements...',
+        bk_submit: 'Send request',
+        bk_note: "This request is not a confirmed booking. Régis will contact you within 24 hours to confirm availability and payment details.",
+        bk_success_title: 'Request sent!',
+        bk_success_p1: 'Your request has been recorded.',
+        bk_success_p2: 'Régis will contact you within 24 hours to confirm your booking.',
+        bk_checkin: 'Check-in', bk_checkout: 'Check-out', bk_nights: 'nights',
+        bk_err_booked: 'Some selected dates are already booked.',
+        bk_err_server: 'Server error. Please try again.',
+        footer_copy: '© 2026 La Garance en Provence. All rights reserved.',
+      },
+    };
+
+    let lang = localStorage.getItem('garance-lang') || 'fr';
+    let currentYear, currentMonth;
+    let bookedDates = new Set();
+    let checkIn = null, checkOut = null;
+    let weeklyRate = 3000;
+
+    const today = new Date();
+    currentYear = today.getFullYear();
+    currentMonth = today.getMonth() + 1;
+
+    // ---- Init ----
+    document.addEventListener('DOMContentLoaded', () => {
+      setupLang();
+      renderCalendar();
+      setupForm();
+      setupMobileMenu();
+    });
+
+    // ---- Language ----
+    function setupLang() {
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          lang = btn.dataset.lang;
+          localStorage.setItem('garance-lang', lang);
+          applyTranslations();
+          updateLangBtns();
+          renderCalendar();
+        });
+      });
+      applyTranslations();
+      updateLangBtns();
+    }
+
+    function updateLangBtns() {
+      document.querySelectorAll('.lang-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.lang === lang));
+    }
+
+    function applyTranslations() {
+      const t = T[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (t[k] !== undefined) {
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = t[k];
+          else el.innerHTML = t[k];
+        }
+      });
+      document.documentElement.lang = lang;
+    }
+
+    // ---- Calendar ----
+    function renderCalendar() {
+      const grid = document.getElementById('cal-grid');
+      const title = document.getElementById('cal-title');
+      title.textContent = `${MONTH_NAMES[lang][currentMonth - 1]} ${currentYear}`;
+
+      // Build booked dates from static ranges
+      bookedDates = new Set();
+      weeklyRate = WEEKLY_RATES[currentMonth] || 6500;
+      const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+      const monthStart = `${currentYear}-${String(currentMonth).padStart(2,'0')}-01`;
+      const monthEnd = `${currentYear}-${String(currentMonth).padStart(2,'0')}-${String(daysInMonth).padStart(2,'0')}`;
+
+      BLOCKED_RANGES.forEach(range => {
+        if (range.to < monthStart || range.from > monthEnd) return;
+        const start = new Date(Math.max(new Date(range.from), new Date(monthStart)));
+        const end = new Date(Math.min(new Date(range.to), new Date(monthEnd)));
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          bookedDates.add(d.toISOString().slice(0, 10));
+        }
+      });
+
+      // Build grid
+      grid.innerHTML = '';
+
+      // Day labels
+      DAY_LABELS[lang].forEach(d => {
+        const el = document.createElement('div');
+        el.className = 'cal-day-label';
+        el.textContent = d;
+        grid.appendChild(el);
+      });
+
+      // First day of month (Monday=0)
+      const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
+      const startOffset = (firstDay + 6) % 7; // Mon=0
+      const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+      // Empty cells
+      for (let i = 0; i < startOffset; i++) {
+        const el = document.createElement('div');
+        el.className = 'cal-day empty';
+        grid.appendChild(el);
+      }
+
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${currentYear}-${String(currentMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const el = document.createElement('div');
+        el.className = 'cal-day';
+        el.textContent = d;
+        el.dataset.date = dateStr;
+
+        if (dateStr === todayStr) el.classList.add('today');
+        if (dateStr < todayStr) el.classList.add('past');
+        if (bookedDates.has(dateStr)) el.classList.add('booked');
+
+        // Selection state
+        if (checkIn === dateStr) el.classList.add('selected');
+        if (checkOut === dateStr) el.classList.add('selected');
+        if (checkIn && checkOut && dateStr > checkIn && dateStr < checkOut) el.classList.add('in-range');
+
+        el.addEventListener('click', () => onDayClick(dateStr, el));
+        grid.appendChild(el);
+      }
+    }
+
+    function onDayClick(dateStr) {
+      const el = document.querySelector(`[data-date="${dateStr}"]`);
+      if (!el || el.classList.contains('past') || el.classList.contains('booked') || el.classList.contains('empty')) return;
+
+      if (!checkIn || (checkIn && checkOut)) {
+        // Start new selection
+        checkIn = dateStr;
+        checkOut = null;
+      } else {
+        // Set checkout
+        if (dateStr <= checkIn) {
+          checkIn = dateStr;
+          checkOut = null;
+        } else {
+          // Check no booked dates in range
+          let blocked = false;
+          bookedDates.forEach(bd => {
+            if (bd > checkIn && bd < dateStr) blocked = true;
+          });
+          if (blocked) {
+            alert(T[lang].bk_err_booked);
+            return;
+          }
+          checkOut = dateStr;
+        }
+      }
+
+      updateSelection();
+      renderCalendar();
+    }
+
+    function updateSelection() {
+      const display = document.getElementById('date-display');
+      const btn = document.getElementById('btn-book');
+      const summary = document.getElementById('price-summary');
+
+      if (checkIn && checkOut) {
+        const ciDate = new Date(checkIn);
+        const coDate = new Date(checkOut);
+        const nights = Math.round((coDate - ciDate) / 86400000);
+        const t = T[lang];
+
+        const fmt = d => d.toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        display.innerHTML = `<strong>${t.bk_checkin}:</strong> ${fmt(ciDate)} &nbsp;→&nbsp; <strong>${t.bk_checkout}:</strong> ${fmt(coDate)} &nbsp;(${nights} ${t.bk_nights})`;
+
+        // Price calc
+        const weeks = nights / 7;
+        const accom = weeklyRate * weeks;
+        const cleaning = 250 * weeks;
+        const adults = parseInt(document.querySelector('[name="num_adults"]').value) || 6;
+        const taxe = adults * nights * 1.86;
+        const total = accom + cleaning + taxe;
+
+        document.getElementById('price-accom').textContent = `${Math.round(accom).toLocaleString()} €`;
+        document.getElementById('price-cleaning').textContent = `${Math.round(cleaning).toLocaleString()} €`;
+        document.getElementById('price-taxe').textContent = `${Math.round(taxe)} €`;
+        document.getElementById('price-total').textContent = `${Math.round(total).toLocaleString()} €`;
+
+        summary.style.display = 'block';
+        btn.disabled = false;
+      } else if (checkIn) {
+        const ciDate = new Date(checkIn);
+        const fmt = d => d.toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        display.innerHTML = `<strong>${T[lang].bk_checkin}:</strong> ${fmt(ciDate)} → <em>${lang === 'fr' ? 'choisissez la date de départ' : 'select check-out date'}</em>`;
+        summary.style.display = 'none';
+        btn.disabled = true;
+      } else {
+        display.innerHTML = `<span>${T[lang].bk_select_dates}</span>`;
+        summary.style.display = 'none';
+        btn.disabled = true;
+      }
+    }
+
+    // Update price when adults change
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelector('[name="num_adults"]')?.addEventListener('change', updateSelection);
+    });
+
+    // Nav buttons
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('cal-prev').addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+        renderCalendar();
+      });
+      document.getElementById('cal-next').addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+        renderCalendar();
+      });
+    });
+
+    // ---- Form (mailto — no backend needed) ----
+    function setupForm() {
+      const form = document.getElementById('booking-form');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!checkIn || !checkOut) return;
+
+        const name = form.guest_name.value;
+        const email = form.guest_email.value;
+        const phone = form.guest_phone.value || '-';
+        const address = form.guest_address.value || '-';
+        const guests = form.num_guests.value;
+        const adults = form.num_adults.value;
+        const children = form.num_children.value;
+        const message = form.message.value || '-';
+
+        const ciDate = new Date(checkIn);
+        const coDate = new Date(checkOut);
+        const nights = Math.round((coDate - ciDate) / 86400000);
+        const weeks = nights / 7;
+        const accom = weeklyRate * weeks;
+        const cleaning = 250 * weeks;
+        const taxe = parseInt(adults) * nights * 1.86;
+        const total = accom + cleaning + taxe;
+
+        const subject = encodeURIComponent(`Demande de reservation - ${name} - ${checkIn} au ${checkOut}`);
+        const body = encodeURIComponent(
+          `Nouvelle demande de reservation\n` +
+          `================================\n\n` +
+          `Nom: ${name}\n` +
+          `Email: ${email}\n` +
+          `Telephone: ${phone}\n` +
+          `Adresse: ${address}\n\n` +
+          `Arrivee: ${checkIn}\n` +
+          `Depart: ${checkOut}\n` +
+          `Nuits: ${nights}\n\n` +
+          `Voyageurs: ${guests} (${adults} adultes, ${children} enfants)\n\n` +
+          `Estimation:\n` +
+          `  Hebergement: ${Math.round(accom)} EUR\n` +
+          `  Menage: ${Math.round(cleaning)} EUR\n` +
+          `  Taxe de sejour: ${Math.round(taxe)} EUR\n` +
+          `  Total: ${Math.round(total)} EUR\n\n` +
+          `Message: ${message}\n`
+        );
+
+        window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+
+        // Show success
+        form.style.display = 'none';
+        document.getElementById('booking-success').style.display = 'block';
+        document.getElementById('booking-ref').textContent = '';
+      });
+    }
+
+    // ---- Mobile menu ----
+    function setupMobileMenu() {
+      const hamburger = document.querySelector('.nav-hamburger');
+      const navLinks = document.querySelector('.nav-links');
+      hamburger?.addEventListener('click', () => {
+        navLinks.classList.toggle('mobile-open');
+        document.body.style.overflow = navLinks.classList.contains('mobile-open') ? 'hidden' : '';
+      });
+      navLinks?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('mobile-open');
+          document.body.style.overflow = '';
+        });
+      });
+    }
+
+  })();
+  </script>
+
+</body>
+</html>
