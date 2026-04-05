@@ -6,10 +6,64 @@
   <title>La Garance en Provence — Location de vacances, Le Thor, Vaucluse</title>
   <meta name="description" content="La Garance en Provence : ancien Relais de Poste du XVIIe siècle restauré. 6 chambres, piscine à débordement, entre Avignon et le Luberon. Location exclusive.">
   <meta name="keywords" content="location vacances provence, le thor, vaucluse, luberon, avignon, piscine, maison de charme, gîte luxe">
-  <meta property="og:title" content="La Garance en Provence">
+  <link rel="canonical" href="https://dev.garance-provence.com/">
+  <meta property="og:title" content="La Garance en Provence — Location de vacances en Provence">
   <meta property="og:description" content="Ancien Relais de Poste du XVIIe siècle, 6 chambres, piscine à débordement, entre Avignon et le Luberon.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.garance-provence.com">
+  <meta property="og:url" content="https://dev.garance-provence.com">
+  <meta property="og:image" content="https://dev.garance-provence.com/images/garance_01.jpg">
+  <meta property="og:locale" content="fr_FR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="La Garance en Provence — Location de vacances">
+  <meta name="twitter:description" content="Ancien Relais de Poste du XVIIe siècle restauré. 6 chambres, piscine à débordement, entre Avignon et le Luberon.">
+  <meta name="twitter:image" content="https://dev.garance-provence.com/images/garance_01.jpg">
+  <meta name="geo.region" content="FR-84">
+  <meta name="geo.placename" content="Le Thor">
+
+  <!-- Preload hero image -->
+  <link rel="preload" as="image" href="images/garance_03.jpg">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LodgingBusiness",
+    "name": "La Garance en Provence",
+    "description": "Ancien Relais de Poste du XVIIe siècle restauré. 6 chambres avec salle de bain privative, piscine à débordement de 17m, entre Avignon et le Luberon.",
+    "url": "https://dev.garance-provence.com",
+    "image": "https://dev.garance-provence.com/images/garance_01.jpg",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "4010 Route de Saint Saturnin d'Avignon",
+      "addressLocality": "Le Thor",
+      "postalCode": "84250",
+      "addressRegion": "Vaucluse",
+      "addressCountry": "FR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 43.905,
+      "longitude": 4.978
+    },
+    "telephone": "+33607560623",
+    "starRating": {
+      "@type": "Rating",
+      "ratingValue": "3"
+    },
+    "numberOfRooms": 6,
+    "amenityFeature": [
+      {"@type": "LocationFeatureSpecification", "name": "Piscine à débordement 17m", "value": true},
+      {"@type": "LocationFeatureSpecification", "name": "Wi-Fi gratuit", "value": true},
+      {"@type": "LocationFeatureSpecification", "name": "Parking privé", "value": true},
+      {"@type": "LocationFeatureSpecification", "name": "Borne recharge électrique", "value": true}
+    ],
+    "checkinTime": "16:00",
+    "checkoutTime": "10:00",
+    "priceRange": "6500€ - 7650€ / semaine",
+    "currenciesAccepted": "EUR",
+    "maximumAttendeeCapacity": 12
+  }
+  </script>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,7 +120,7 @@
     <div class="container">
       <div class="about-grid">
         <div class="about-image reveal">
-          <img src="images/garance_18.jpg"
+          <img loading="lazy" src="images/garance_18.jpg"
                alt="La Garance en Provence — cour intérieure avec platanes centenaires et lavande">
         </div>
         <div class="about-text reveal">
@@ -75,7 +129,7 @@
           <p data-i18n="about_p1">Nichée entre Avignon et L'Isle-sur-la-Sorgue, aux portes du Luberon, La Garance en Provence est une demeure de caractère qui allie le charme de l'authentique à un confort contemporain. Cette ancienne halte de diligences a été restaurée avec passion, préservant pierres apparentes, poutres anciennes et sols en pierre.</p>
           <p data-i18n="about_p2">La propriété offre une vue imprenable sur le Château de Thouzon et s'étend dans un parc ombragé de platanes centenaires. Louée en exclusivité, elle accueille jusqu'à 12 convives dans 6 chambres raffinées, chacune dotée de sa salle de bain privative.</p>
           <div class="about-owners" style="display:flex;align-items:center;gap:16px;margin:20px 0;">
-            <img src="images/garance_12.jpg" alt="Régis et Chantal" style="width:100px;height:100px;border-radius:50%;object-fit:cover;">
+            <img loading="lazy" src="images/garance_12.jpg" alt="Régis et Chantal" style="width:100px;height:100px;border-radius:50%;object-fit:cover;">
             <p style="font-style:italic;color:var(--charcoal-lt);font-size:0.95rem;" data-i18n="about_owners">Régis et Chantal vous accueillent avec passion dans leur demeure familiale.</p>
           </div>
           <div class="about-features">
@@ -111,7 +165,7 @@
         <!-- Room 1 -->
         <div class="room-card reveal">
           <div class="room-card-img">
-            <img src="images/garance_10.jpg"
+            <img loading="lazy" src="images/garance_10.jpg"
                  alt="Chambre Jardin — lit double, murs à la chaux, mobilier ancien">
           </div>
           <div class="room-card-body">
@@ -124,7 +178,7 @@
         <!-- Room 2 -->
         <div class="room-card reveal">
           <div class="room-card-img">
-            <img src="images/garance_08.jpg"
+            <img loading="lazy" src="images/garance_08.jpg"
                  alt="Chambre Bastide — lit fer forgé, poutres apparentes, bleu provençal">
           </div>
           <div class="room-card-body">
@@ -137,7 +191,7 @@
         <!-- Room 3 -->
         <div class="room-card reveal">
           <div class="room-card-img">
-            <img src="images/garance_11.jpg"
+            <img loading="lazy" src="images/garance_11.jpg"
                  alt="Chambre Provence — lits jumeaux, linge rose poudré">
           </div>
           <div class="room-card-body">
@@ -250,40 +304,40 @@
       <p class="section-subtitle reveal" data-i18n="gallery_sub">Découvrez La Garance en images</p>
       <div class="gallery-grid">
         <div class="gallery-item tall reveal">
-          <img src="images/garance_01.jpg" alt="Façade principale et jardins">
+          <img loading="lazy" src="images/garance_01.jpg" alt="Façade principale et jardins">
         </div>
         <div class="gallery-item wide reveal">
-          <img src="images/garance_13.jpg" alt="Piscine à débordement 17m">
+          <img loading="lazy" src="images/garance_13.jpg" alt="Piscine à débordement 17m">
         </div>
         <div class="gallery-item reveal">
-          <img src="images/garance_05.jpg" alt="Salon avec cheminée et poutres">
+          <img loading="lazy" src="images/garance_05.jpg" alt="Salon avec cheminée et poutres">
         </div>
         <div class="gallery-item reveal">
-          <img src="images/garance_07.jpg" alt="Salon en pierre, cheminée monumentale">
+          <img loading="lazy" src="images/garance_07.jpg" alt="Salon en pierre, cheminée monumentale">
         </div>
         <div class="gallery-item reveal">
-          <img src="images/garance_04.jpg" alt="Terrasse couverte et salon extérieur">
+          <img loading="lazy" src="images/garance_04.jpg" alt="Terrasse couverte et salon extérieur">
         </div>
         <div class="gallery-item wide reveal">
-          <img src="images/garance_14.jpg" alt="Déjeuner sous les platanes">
+          <img loading="lazy" src="images/garance_14.jpg" alt="Déjeuner sous les platanes">
         </div>
         <div class="gallery-item reveal">
-          <img src="images/garance_09.jpg" alt="Salle de bain en pierre, double vasque">
+          <img loading="lazy" src="images/garance_09.jpg" alt="Salle de bain en pierre, double vasque">
         </div>
         <div class="gallery-item reveal">
-          <img src="images/garance_16.jpg" alt="Vue piscine et mas">
+          <img loading="lazy" src="images/garance_16.jpg" alt="Vue piscine et mas">
         </div>
         <div class="gallery-item reveal">
-          <img src="images/garance_02.jpg" alt="Façade et transats au bord de la piscine">
+          <img loading="lazy" src="images/garance_02.jpg" alt="Façade et transats au bord de la piscine">
         </div>
         <div class="gallery-item wide reveal">
-          <img src="images/garance_19.jpg" alt="Bains de soleil dans le parc">
+          <img loading="lazy" src="images/garance_19.jpg" alt="Bains de soleil dans le parc">
         </div>
         <div class="gallery-item reveal">
-          <img src="images/garance_06.jpg" alt="Pergola et jardin au bord de la piscine">
+          <img loading="lazy" src="images/garance_06.jpg" alt="Pergola et jardin au bord de la piscine">
         </div>
         <div class="gallery-item reveal">
-          <img src="images/garance_15.jpg" alt="Lecture sous les platanes">
+          <img loading="lazy" src="images/garance_15.jpg" alt="Lecture sous les platanes">
         </div>
       </div>
     </div>
