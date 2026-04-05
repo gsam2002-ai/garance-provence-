@@ -109,6 +109,12 @@
       cursor: not-allowed;
       text-decoration: line-through;
     }
+    .cal-day.checkout {
+      background: linear-gradient(135deg, #f0d0d0 50%, var(--cream) 50%);
+      color: #666;
+      cursor: pointer;
+      font-weight: 600;
+    }
     .cal-day.selected {
       background: var(--terracotta);
       color: #fff;
@@ -140,6 +146,7 @@
     .cal-legend-dot.avail { background: var(--cream); border: 1px solid #ddd; }
     .cal-legend-dot.booked { background: #f0d0d0; }
     .cal-legend-dot.unavail { background: #e8e8e8; }
+    .cal-legend-dot.checkout { background: linear-gradient(135deg, #f0d0d0 50%, var(--cream) 50%); }
     .cal-legend-dot.selected { background: var(--terracotta); }
 
     /* Price summary */
@@ -327,6 +334,7 @@
             <div class="cal-legend">
               <span><span class="cal-legend-dot avail"></span> <span data-i18n="bk_available">Disponible</span></span>
               <span><span class="cal-legend-dot booked"></span> <span data-i18n="bk_booked">Réservé</span></span>
+              <span><span class="cal-legend-dot checkout"></span> <span data-i18n="bk_checkout_avail">Départ / Arrivée possible</span></span>
               <span><span class="cal-legend-dot unavail"></span> <span data-i18n="bk_unavailable">Non disponible</span></span>
               <span><span class="cal-legend-dot selected"></span> <span data-i18n="bk_selected">Sélectionné</span></span>
             </div>
@@ -458,12 +466,14 @@
 
     // ---- Config (STATIC MODE — no backend needed) ----
     // Blocked date ranges: update this list when bookings change
-    // Booked = reserved by guests
+    // Booked = reserved by guests (to = checkout day, available for new check-in)
     const BOOKED_RANGES = [
       { from: '2026-06-27', to: '2026-07-04' },  // Carter
       { from: '2026-07-18', to: '2026-07-25' },  // Jault
       { from: '2026-07-25', to: '2026-09-05' },  // De Graaf
     ];
+    // Checkout days = half-day (departure morning, available for check-in evening)
+    const CHECKOUT_DATES = new Set(['2026-07-04', '2026-07-25', '2026-09-05']);
     // Unavailable = property not available (not rented out)
     const UNAVAILABLE_RANGES = [
       { from: '2026-01-01', to: '2026-06-27' },  // Hors saison
@@ -652,7 +662,11 @@
 
         if (dateStr === todayStr) el.classList.add('today');
         if (dateStr < todayStr) el.classList.add('past');
-        if (bookedDates.has(dateStr)) el.classList.add('booked');
+        if (CHECKOUT_DATES.has(dateStr) && bookedDates.has(dateStr)) {
+          el.classList.add('checkout');
+        } else if (bookedDates.has(dateStr)) {
+          el.classList.add('booked');
+        }
         if (unavailableDates.has(dateStr) && !bookedDates.has(dateStr)) el.classList.add('unavailable');
 
         // Selection state
