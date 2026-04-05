@@ -615,7 +615,6 @@
       // First day of month (Monday=0)
       const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
       const startOffset = (firstDay + 6) % 7; // Mon=0
-      const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
 
       // Empty cells
       for (let i = 0; i < startOffset; i++) {
