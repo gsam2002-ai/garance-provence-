@@ -473,7 +473,8 @@
       { from: '2026-07-25', to: '2026-09-05' },  // De Graaf
     ];
     // Checkout days = half-day (departure morning, available for check-in evening)
-    const CHECKOUT_DATES = new Set(['2026-07-04', '2026-07-25', '2026-09-05']);
+    // Days where a transition happens: available as check-in OR check-out
+    const CHECKOUT_DATES = new Set(['2026-07-04', '2026-07-18']);
     // Unavailable = property not available (not rented out)
     const UNAVAILABLE_RANGES = [
       { from: '2026-01-01', to: '2026-06-27' },  // Hors saison
