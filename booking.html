@@ -92,7 +92,7 @@
       transition: all 0.2s;
       position: relative;
     }
-    .cal-day:hover:not(.booked):not(.empty):not(.past) {
+    .cal-day:hover:not(.booked):not(.unavailable):not(.empty):not(.past) {
       background: var(--cream);
     }
     .cal-day.empty { cursor: default; }
@@ -102,6 +102,12 @@
       color: #a04040;
       cursor: not-allowed;
       font-weight: 600;
+    }
+    .cal-day.unavailable {
+      background: #e8e8e8;
+      color: #999;
+      cursor: not-allowed;
+      text-decoration: line-through;
     }
     .cal-day.selected {
       background: var(--terracotta);
@@ -133,6 +139,7 @@
     }
     .cal-legend-dot.avail { background: var(--cream); border: 1px solid #ddd; }
     .cal-legend-dot.booked { background: #f0d0d0; }
+    .cal-legend-dot.unavail { background: #e8e8e8; }
     .cal-legend-dot.selected { background: var(--terracotta); }
 
     /* Price summary */
@@ -320,6 +327,7 @@
             <div class="cal-legend">
               <span><span class="cal-legend-dot avail"></span> <span data-i18n="bk_available">Disponible</span></span>
               <span><span class="cal-legend-dot booked"></span> <span data-i18n="bk_booked">Réservé</span></span>
+              <span><span class="cal-legend-dot unavail"></span> <span data-i18n="bk_unavailable">Non disponible</span></span>
               <span><span class="cal-legend-dot selected"></span> <span data-i18n="bk_selected">Sélectionné</span></span>
             </div>
           </div>
@@ -450,11 +458,15 @@
 
     // ---- Config (STATIC MODE — no backend needed) ----
     // Blocked date ranges: update this list when bookings change
-    const BLOCKED_RANGES = [
-      { from: '2026-01-01', to: '2026-06-27' },  // Hors saison
+    // Booked = reserved by guests
+    const BOOKED_RANGES = [
       { from: '2026-06-27', to: '2026-07-04' },  // Carter
       { from: '2026-07-18', to: '2026-07-25' },  // Jault
       { from: '2026-07-25', to: '2026-09-05' },  // De Graaf
+    ];
+    // Unavailable = property not available (not rented out)
+    const UNAVAILABLE_RANGES = [
+      { from: '2026-01-01', to: '2026-06-27' },  // Hors saison
       { from: '2026-09-05', to: '2026-12-31' },  // Hors saison
     ];
 
@@ -484,7 +496,7 @@
         nav_pricing: 'Tarifs', nav_booking: 'Réserver', nav_contact: 'Contact',
         bk_title: 'Réserver votre séjour',
         bk_subtitle: 'Vérifiez les disponibilités et envoyez votre demande',
-        bk_available: 'Disponible', bk_booked: 'Réservé', bk_selected: 'Sélectionné',
+        bk_available: 'Disponible', bk_booked: 'Réservé', bk_unavailable: 'Non disponible', bk_selected: 'Sélectionné',
         bk_estimate: 'Estimation tarifaire',
         bk_accom: 'Hébergement', bk_cleaning: 'Ménage', bk_taxe: 'Taxe de séjour',
         bk_form_title: 'Demande de réservation',
@@ -508,7 +520,7 @@
         nav_pricing: 'Rates', nav_booking: 'Book', nav_contact: 'Contact',
         bk_title: 'Book your stay',
         bk_subtitle: 'Check availability and send your request',
-        bk_available: 'Available', bk_booked: 'Booked', bk_selected: 'Selected',
+        bk_available: 'Available', bk_booked: 'Booked', bk_unavailable: 'Unavailable', bk_selected: 'Selected',
         bk_estimate: 'Price estimate',
         bk_accom: 'Accommodation', bk_cleaning: 'Cleaning', bk_taxe: 'Tourist tax',
         bk_form_title: 'Booking request',
@@ -532,6 +544,7 @@
     let lang = localStorage.getItem('garance-lang') || 'fr';
     let currentYear, currentMonth;
     let bookedDates = new Set();
+    let unavailableDates = new Set();
     let checkIn = null, checkOut = null;
     let weeklyRate = 3000;
 
@@ -585,21 +598,26 @@
       const title = document.getElementById('cal-title');
       title.textContent = `${MONTH_NAMES[lang][currentMonth - 1]} ${currentYear}`;
 
-      // Build booked dates from static ranges
+      // Build booked & unavailable dates from static ranges
       bookedDates = new Set();
+      unavailableDates = new Set();
       weeklyRate = WEEKLY_RATES[currentMonth] || 6500;
       const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
       const monthStart = `${currentYear}-${String(currentMonth).padStart(2,'0')}-01`;
       const monthEnd = `${currentYear}-${String(currentMonth).padStart(2,'0')}-${String(daysInMonth).padStart(2,'0')}`;
 
-      BLOCKED_RANGES.forEach(range => {
-        if (range.to < monthStart || range.from > monthEnd) return;
-        const start = new Date(Math.max(new Date(range.from), new Date(monthStart)));
-        const end = new Date(Math.min(new Date(range.to), new Date(monthEnd)));
-        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-          bookedDates.add(d.toISOString().slice(0, 10));
-        }
-      });
+      function fillDates(ranges, targetSet) {
+        ranges.forEach(range => {
+          if (range.to < monthStart || range.from > monthEnd) return;
+          const start = new Date(Math.max(new Date(range.from), new Date(monthStart)));
+          const end = new Date(Math.min(new Date(range.to), new Date(monthEnd)));
+          for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            targetSet.add(d.toISOString().slice(0, 10));
+          }
+        });
+      }
+      fillDates(BOOKED_RANGES, bookedDates);
+      fillDates(UNAVAILABLE_RANGES, unavailableDates);
 
       // Build grid
       grid.innerHTML = '';
@@ -635,6 +653,7 @@
         if (dateStr === todayStr) el.classList.add('today');
         if (dateStr < todayStr) el.classList.add('past');
         if (bookedDates.has(dateStr)) el.classList.add('booked');
+        if (unavailableDates.has(dateStr) && !bookedDates.has(dateStr)) el.classList.add('unavailable');
 
         // Selection state
         if (checkIn === dateStr) el.classList.add('selected');
@@ -648,7 +667,7 @@
 
     function onDayClick(dateStr) {
       const el = document.querySelector(`[data-date="${dateStr}"]`);
-      if (!el || el.classList.contains('past') || el.classList.contains('booked') || el.classList.contains('empty')) return;
+      if (!el || el.classList.contains('past') || el.classList.contains('booked') || el.classList.contains('unavailable') || el.classList.contains('empty')) return;
 
       if (!checkIn || (checkIn && checkOut)) {
         // Start new selection
