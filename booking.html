@@ -628,6 +628,8 @@
       }
       fillDates(BOOKED_RANGES, bookedDates);
       fillDates(UNAVAILABLE_RANGES, unavailableDates);
+      // Remove checkout days from booked — they are available for check-in
+      CHECKOUT_DATES.forEach(d => bookedDates.delete(d));
 
       // Build grid
       grid.innerHTML = '';
@@ -662,7 +664,7 @@
 
         if (dateStr === todayStr) el.classList.add('today');
         if (dateStr < todayStr) el.classList.add('past');
-        if (CHECKOUT_DATES.has(dateStr) && bookedDates.has(dateStr)) {
+        if (CHECKOUT_DATES.has(dateStr)) {
           el.classList.add('checkout');
         } else if (bookedDates.has(dateStr)) {
           el.classList.add('booked');
