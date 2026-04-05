@@ -408,9 +408,17 @@
           </div>
           <div class="contact-info-block">
             <h3 data-i18n="ct_email">Email</h3>
-            <p><a href="mailto:contact@garance-provence.com">contact@garance-provence.com</a></p>
+            <p><a href="#" id="email-link" onclick="return false;">contact<span style="display:none">REMOVE</span>&#64;garance&#45;provence&#46;com</a></p>
           </div>
         </div>
+        <script>
+        document.addEventListener('DOMContentLoaded',function(){
+          var el=document.getElementById('email-link');
+          var e=atob('Y29udGFjdEBnYXJhbmNlLXByb3ZlbmNlLmNvbQ==');
+          el.href='mai'+'lto:'+e;
+          el.onclick=null;
+        });
+        </script>
         <form id="contact-form" class="contact-form reveal">
           <div class="form-row">
             <div>
@@ -470,7 +478,8 @@
           <h4 data-i18n="footer_ct">Contact</h4>
           <p>Régis et Chantal Sanglier</p>
           <p><a href="tel:+33607560623">06 07 56 06 23</a></p>
-          <p><a href="mailto:contact@garance-provence.com">contact@garance-provence.com</a></p>
+          <p><a href="#" id="footer-email" onclick="return false;">contact<span style="display:none">REMOVE</span>&#64;garance&#45;provence&#46;com</a></p>
+          <script>document.addEventListener('DOMContentLoaded',function(){var el=document.getElementById('footer-email');var e=atob('Y29udGFjdEBnYXJhbmNlLXByb3ZlbmNlLmNvbQ==');el.href='mai'+'lto:'+e;el.onclick=null;});</script>
         </div>
       </div>
       <div class="footer-bottom">

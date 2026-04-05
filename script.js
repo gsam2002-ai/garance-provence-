@@ -444,7 +444,8 @@
         `Nom: ${name}\nEmail: ${email}\nDates souhaitees: ${dates}\nVoyageurs: ${guests}\n\nMessage:\n${message}`
       );
 
-      window.location.href = `mailto:contact@garance-provence.com?subject=${subject}&body=${body}`;
+      const _e = atob('Y29udGFjdEBnYXJhbmNlLXByb3ZlbmNlLmNvbQ==');
+      window.location.href = `mailto:${_e}?subject=${subject}&body=${body}`;
 
       form.innerHTML = currentLang === 'fr'
         ? '<div style="text-align:center;padding:40px 0"><h3 style="color:var(--olive);margin-bottom:8px">Message envoy\u00e9 !</h3><p>R\u00e9gis vous r\u00e9pondra dans les meilleurs d\u00e9lais.</p></div>'
